@@ -118,7 +118,6 @@ const employees = [
     imagePath: 'assets/images/users/5.jpg',
   },
 ];
-
 @Component({
   templateUrl: './employee.component.html',
 })

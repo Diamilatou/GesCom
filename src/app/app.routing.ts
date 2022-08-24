@@ -24,9 +24,29 @@ export const AppRoutes: Routes = [
           import('./dashboards/dashboards.module').then((m) => m.DashboardsModule),
       },
       {
-        path: 'material',
+        path: 'ventes',
         loadChildren: () =>
-          import('./material-component/material.module').then((m) => m.MaterialComponentsModule),
+          import('./Ventes/ventes.module').then((m) => m.VentesModule),
+      },
+      {
+        path: 'produits',
+        loadChildren: () =>
+          import('./Produits/produits.module').then((m) => m.ProduitsModule),
+      },
+      {
+        path: 'achats',
+        loadChildren: () =>
+          import('./Achats/achats.module').then((m) => m.AchatsModule),
+      },
+      {
+        path: 'stocks',
+        loadChildren: () =>
+          import('./Stocks/stocks.module').then((m) => m.StocksModule),
+      },
+      {
+        path: 'tresorerie',
+        loadChildren: () =>
+          import('./Tresorerie/tresorerie.module').then((m) => m.TresorerieModule),
       },
       {
         path: 'apps',
