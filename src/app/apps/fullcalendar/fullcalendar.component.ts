@@ -181,7 +181,7 @@ export class FullcalendarComponent {
     this.dialogRef.afterClosed().subscribe((result: string) => {
       this.lastCloseResult = result;
       this.dialogRef = Object.create(null);
-      this.refresh.next();
+      // this.refresh.next();
     });
   }
 
@@ -202,7 +202,7 @@ export class FullcalendarComponent {
       responseEvent.actions = this.actions;
       this.events.push(responseEvent);
       this.dialogRef2 = Object.create(null);
-      this.refresh.next();
+      // this.refresh.next();
     });
   }
 
