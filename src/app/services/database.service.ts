@@ -6,8 +6,8 @@ import {
 // import typings
 import {
   RxHeroDocument,
-  RxHeroesDatabase,
-  RxHeroesCollections
+  RxGesComDatabase,
+  RxGesComCollections
 } from './../RxDB.d';
 
 import {
@@ -31,24 +31,11 @@ import {
   DATABASE_NAME,
   IS_SERVER_SIDE_RENDERING
 } from '../../shared';
-import { HERO_SCHEMA, RxHeroDocumentType } from '../schemas/hero.schema';
 
+import { RxDBMigrationPlugin } from 'rxdb/plugins/migration';
+import { collectionSettings, ReplicationCouchDB, strategieMigration } from '../RxSettingsCollection';
+import { preInsertHooks } from '../RxHooks';
 
-const collectionSettings = {
-  [HERO_COLLECTION_NAME]: {
-      schema: HERO_SCHEMA,
-      methods: {
-          hpPercent(this: RxHeroDocument): number {
-              return this.hp / this.maxHP * 100;
-          }
-      },
-      sync: true
-  }
-};
-
-const syncHost = IS_SERVER_SIDE_RENDERING ? 'localhost' : window.location.hostname;
-const syncURL = 'http://' + syncHost + ':' + COUCHDB_PORT + '/' + DATABASE_NAME;
-console.log('syncURL: ' + syncURL);
 
 
 function doSync(): boolean {
@@ -67,6 +54,9 @@ function doSync(): boolean {
 * Loads RxDB plugins
 */
 async function loadRxDBPlugins(): Promise<void> {
+     // for the migration
+  addRxPlugin(RxDBMigrationPlugin);
+  
   addRxPlugin(RxDBReplicationCouchDBPlugin);
   // http-adapter is always needed for replication with the node-server
   addPouchPlugin(PouchdbAdapterHttp);
@@ -88,23 +78,23 @@ async function loadRxDBPlugins(): Promise<void> {
    * to reduce the build-size,
    * we use some modules in dev-mode only
    */
-  if (isDevMode() && !IS_SERVER_SIDE_RENDERING) {
-      await Promise.all([
+//   if (isDevMode() && !IS_SERVER_SIDE_RENDERING) {
+//       await Promise.all([
 
-          // add dev-mode plugin
-          // which does many checks and add full error-messages
-          import('rxdb/plugins/dev-mode').then(
-              module => addRxPlugin(module as any)
-          )
-      ]);
-  } else { }
+//           // add dev-mode plugin
+//           // which does many checks and add full error-messages
+//           import('rxdb/plugins/dev-mode').then(
+//               module => addRxPlugin(module as any)
+//           )
+//       ]);
+//   } else { }
 
 }
 
 /**
 * creates the database
 */
-async function _create(): Promise<RxHeroesDatabase> {
+async function _create(): Promise<RxGesComDatabase> {
 
   await loadRxDBPlugins();
 
@@ -117,7 +107,7 @@ async function _create(): Promise<RxHeroesDatabase> {
   }
 
   console.log('DatabaseService: creating database..');
-  const db = await createRxDatabase<RxHeroesCollections>({
+  const db = await createRxDatabase<RxGesComCollections>({
       name: DATABASE_NAME,
       storage,
       multiInstance: !IS_SERVER_SIDE_RENDERING
@@ -143,65 +133,31 @@ async function _create(): Promise<RxHeroesDatabase> {
   console.log('DatabaseService: create collections');
   await db.addCollections(collectionSettings);
 
+  // Migration Strategie
+  strategieMigration(db);
+
   // hooks
   console.log('DatabaseService: add hooks');
-  db.collections.hero.preInsert(function (docObj: RxHeroDocumentType) {
-      const color = docObj.color;
-      return db.collections.hero
-          .findOne({
-              selector: {
-                  color
-              }
-          })
-          .exec()
-          .then((has: RxHeroDocument | null) => {
-              if (has != null) {
-                  alert('another hero already has the color ' + color);
-                  throw new Error('color already there');
-              }
-              return db;
-          });
-  }, false);
+  preInsertHooks(db);
 
   // sync with server
   if (doSync()) {
-      console.log('DatabaseService: sync');
-      const collectionUrl = syncURL + '/' + HERO_COLLECTION_NAME;
-
-      if (IS_SERVER_SIDE_RENDERING) {
-          /**
-           * For server side rendering,
-           * we just run a one-time replication to ensure the client has the same data as the server.
-           */
-          console.log('DatabaseService: await initial replication to ensure SSR has all data');
-          const firstReplication = await db.hero.syncCouchDB({
-              remote: collectionUrl,
-              options: {
-                  live: false
-              }
-          });
-          await firstReplication.awaitInitialReplication();
-      }
-
-      /**
-       * we start a live replication which also sync the ongoing changes
-       */
-      await db.hero.syncCouchDB({
-          remote: collectionUrl,
-          options: {
-              live: true
-          }
-      });
+      console.log('DatabaseService: sync');  
   }
+  ReplicationCouchDB(db,false);
+
+  ReplicationCouchDB(db,true);
 
   console.log('DatabaseService: created');
 
   return db;
+  
+
 }
 
 
 let initState: null | Promise<any> = null;;
-let DB_INSTANCE: RxHeroesDatabase;
+let DB_INSTANCE: RxGesComDatabase;
 
 /**
 * This is run via APP_INITIALIZER in app.module.ts
@@ -221,7 +177,7 @@ export async function initDatabase() {
 
 @Injectable()
 export class DatabaseService {
-  get db(): RxHeroesDatabase {
+  get db(): RxGesComDatabase {
       return DB_INSTANCE;
   }
 }

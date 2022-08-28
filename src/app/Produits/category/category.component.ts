@@ -4,38 +4,38 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dial
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { productDocType } from 'src/app/schemas/product.shema';
-// import { AddUnityComponent } from '../add-unity/add-unity.component';
-import { ProduitService } from './produit.service';
+import { CategoryDocType } from 'src/app/schemas/category.schema';
+import { CategoryService } from './category.service';
 import {
   tap
 } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { RxUnityDocument } from 'src/app/RxDB';
+
 @Component({
-  selector: 'app-produit',
-  templateUrl: './produit.component.html',
-  styleUrls: ['./produit.component.scss']
+  selector: 'app-category',
+  templateUrl: './category.component.html',
+  styleUrls: ['./category.component.scss']
 })
-export class ProduitComponent implements OnInit {
-  Product: productDocType[] = [];
+export class CategoryComponent implements OnInit {
+  Category: CategoryDocType[] = [];
   emittedFirst = false;
-  dataSource: MatTableDataSource<productDocType>;
+  dataSource: MatTableDataSource<CategoryDocType>;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator = Object.create(null);
   @ViewChild(MatSort, { static: true }) sort: MatSort = Object.create(null);
   ngOnInit(): void {
-    this.getAllProduct();
+    this.getAllCategory();
   }
-  displayedColumns = ['id', 'name','category','unity','seuil','selling_price','buying_price', 'action'];
+  displayedColumns = ['id', 'name', 'action'];
   constructor(
     public dialog: MatDialog,
     public datePipe: DatePipe,
-    public ProduitService: ProduitService,
+    public CategoryService: CategoryService,
     public snackbar: MatSnackBar
     // public servicesGeneratePdfService: ServicesGeneratePdfService,
     // public excelService: ExcelService,
   ) {
-    this.dataSource = new MatTableDataSource(this.Product);
+    this.dataSource = new MatTableDataSource(this.Category);
   }
 
   ngAfterViewInit(): void {
@@ -48,8 +48,8 @@ export class ProduitComponent implements OnInit {
     filterValue = filterValue.toLowerCase(); // Datasource defaults to lowercase matches
     this.dataSource.filter = filterValue;
   }
-  openDialog(action: string, obj: productDocType): void {
-    const dialogRef = this.dialog.open(ProductDialogContentComponent, {
+  openDialog(action: string, obj: CategoryDocType): void {
+    const dialogRef = this.dialog.open(CategoryDialogContentComponent, {
       data: {
         action: action,
         doc: obj
@@ -67,8 +67,8 @@ export class ProduitComponent implements OnInit {
     });
   }
 
-  getAllProduct() {
-    this.ProduitService.getProduct().pipe(
+  getAllCategory() {
+    this.CategoryService.getCategory().pipe(
       tap(() => {
         /**
          * Ensure that this observable runs inside of angulars zone
@@ -82,15 +82,10 @@ export class ProduitComponent implements OnInit {
          */
         this.emittedFirst = true;
       })
-    ).subscribe(Product => {
-      this.Product = Product.map((value,index) => {
+    ).subscribe(Category => {
+      this.Category = Category.map((value,index) => {
         return {
           name: value.name,
-          category:value.getCategory(),
-          unity:value.getUnity(),
-          seuil:value.seuil,
-          selling_price:value.selling_price,
-          buying_price:value.buying_price,
           id: value.id,
           num: index+1,
           status: value.status,
@@ -100,7 +95,7 @@ export class ProduitComponent implements OnInit {
           modified_at:value.modified_at,
         }
       })
-      this.dataSource.data = this.Product;
+      this.dataSource.data = this.Category;
       // this.dataSource.paginator = this.paginator;
       this.dataSource.sort = this.sort;
       
@@ -141,14 +136,20 @@ export class ProduitComponent implements OnInit {
   // }
 
   // tslint:disable-next-line - Disables all
-  async addRowData(row_obj: productDocType): Promise<void> {
-    await this.ProduitService.addProduct(row_obj).then((messages) => {
+  async addRowData(row_obj: CategoryDocType): Promise<void> {
+    await this.CategoryService.addCategory(row_obj).then((messages) => {
       if (messages.inserted) {
         this.openSnackBar(messages.message, ['bg-success', 'text-white']);
-      
+        // this.dialog.open(AddCategoryComponent, {
+        //   data: messages.message,
+        //   disableClose: true,
+        // });
       } else {
         this.openSnackBar(messages.message, ['bg-danger', 'text-white']);
-       
+        // this.dialog.open(AddCategoryComponent, {
+        //   data: messages.message,
+        //   disableClose: true,
+        // });
       }
     })
   }
@@ -162,8 +163,8 @@ export class ProduitComponent implements OnInit {
     })
   }
   // tslint:disable-next-line - Disables all
-  updateRowData(row_obj: productDocType) {
-    this.ProduitService.updateProduct(row_obj).then((messages) => {
+  updateRowData(row_obj: CategoryDocType) {
+    this.CategoryService.updateCategory(row_obj).then((messages) => {
       if (messages?.updated) {
         this.openSnackBar(messages.message, ['bg-success', 'text-dark']);
       } else if (!messages?.updated) {
@@ -173,8 +174,8 @@ export class ProduitComponent implements OnInit {
   }
 
   // // tslint:disable-next-line - Disables all
-  async deleteRowData(row_obj: productDocType) {
-    await this.ProduitService.deleteProduct(row_obj.id).then((deleted) => {
+  async deleteRowData(row_obj: CategoryDocType) {
+    await this.CategoryService.deleteCategory(row_obj.id).then((deleted) => {
       if (deleted) {
         this.openSnackBar("suppression effectuée!", ['bg-success', 'text-dark']);
       } else {
@@ -187,15 +188,15 @@ export class ProduitComponent implements OnInit {
 @Component({
   // tslint:disable-next-line: component-selector 
   selector: 'app-dialog-content',
-  templateUrl: 'product.dialog.html',
+  templateUrl: 'Category.dialog.html',
 })
 // tslint:disable-next-line: component-class-suffix
-export class ProductDialogContentComponent {
+export class CategoryDialogContentComponent {
   local_data: any;
   action = '';
   constructor(
     public datePipe: DatePipe,
-    public dialogRef: MatDialogRef<ProductDialogContentComponent>,
+    public dialogRef: MatDialogRef<CategoryDialogContentComponent>,
     // @Optional() is used to prevent error if no data is passed
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
   ) {
