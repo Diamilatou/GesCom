@@ -16,7 +16,7 @@ export interface Employee {
   Projects: number;
   imagePath: string;
 }
-
+ 
 const employees = [
   {
     id: 1,

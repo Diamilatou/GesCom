@@ -4,38 +4,39 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dial
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { productDocType } from 'src/app/schemas/product.shema';
+import { UnityDocType } from 'src/app/schemas/unity.schema';
 // import { AddUnityComponent } from '../add-unity/add-unity.component';
-import { ProduitService } from './produit.service';
+import { UnityService } from './unity.service';
 import {
   tap
 } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { RxUnityDocument } from 'src/app/RxDB';
 @Component({
-  selector: 'app-produit',
-  templateUrl: './produit.component.html',
-  styleUrls: ['./produit.component.scss']
+  selector: 'app-unity',
+  templateUrl: './unity.component.html',
+  styleUrls: ['./unity.component.scss']
 })
-export class ProduitComponent implements OnInit {
-  Product: productDocType[] = [];
+export class UnityComponent implements OnInit {
+
+  Unity: UnityDocType[] = [];
   emittedFirst = false;
-  dataSource: MatTableDataSource<productDocType>;
+  dataSource: MatTableDataSource<UnityDocType>;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator = Object.create(null);
   @ViewChild(MatSort, { static: true }) sort: MatSort = Object.create(null);
   ngOnInit(): void {
-    this.getAllProduct();
+    this.getAllUnity();
   }
-  displayedColumns = ['id', 'name','category','unity','seuil','selling_price','buying_price', 'action'];
+  displayedColumns = ['id', 'name', 'action'];
   constructor(
     public dialog: MatDialog,
     public datePipe: DatePipe,
-    public ProduitService: ProduitService,
+    public UnityService: UnityService,
     public snackbar: MatSnackBar
     // public servicesGeneratePdfService: ServicesGeneratePdfService,
     // public excelService: ExcelService,
   ) {
-    this.dataSource = new MatTableDataSource(this.Product);
+    this.dataSource = new MatTableDataSource(this.Unity);
   }
 
   ngAfterViewInit(): void {
@@ -48,8 +49,8 @@ export class ProduitComponent implements OnInit {
     filterValue = filterValue.toLowerCase(); // Datasource defaults to lowercase matches
     this.dataSource.filter = filterValue;
   }
-  openDialog(action: string, obj: productDocType): void {
-    const dialogRef = this.dialog.open(ProductDialogContentComponent, {
+  openDialog(action: string, obj: UnityDocType): void {
+    const dialogRef = this.dialog.open(UnityDialogContentComponent, {
       data: {
         action: action,
         doc: obj
@@ -67,8 +68,8 @@ export class ProduitComponent implements OnInit {
     });
   }
 
-  getAllProduct() {
-    this.ProduitService.getProduct().pipe(
+  getAllUnity() {
+    this.UnityService.getUnity().pipe(
       tap(() => {
         /**
          * Ensure that this observable runs inside of angulars zone
@@ -82,15 +83,10 @@ export class ProduitComponent implements OnInit {
          */
         this.emittedFirst = true;
       })
-    ).subscribe(Product => {
-      this.Product = Product.map((value,index) => {
+    ).subscribe(unity => {
+      this.Unity = unity.map((value,index) => {
         return {
           name: value.name,
-          category:value.getCategory(),
-          unity:value.getUnity(),
-          seuil:value.seuil,
-          selling_price:value.selling_price,
-          buying_price:value.buying_price,
           id: value.id,
           num: index+1,
           status: value.status,
@@ -100,7 +96,7 @@ export class ProduitComponent implements OnInit {
           modified_at:value.modified_at,
         }
       })
-      this.dataSource.data = this.Product;
+      this.dataSource.data = this.Unity;
       // this.dataSource.paginator = this.paginator;
       this.dataSource.sort = this.sort;
       
@@ -141,14 +137,20 @@ export class ProduitComponent implements OnInit {
   // }
 
   // tslint:disable-next-line - Disables all
-  async addRowData(row_obj: productDocType): Promise<void> {
-    await this.ProduitService.addProduct(row_obj).then((messages) => {
+  async addRowData(row_obj: UnityDocType): Promise<void> {
+    await this.UnityService.addUnity(row_obj).then((messages) => {
       if (messages.inserted) {
         this.openSnackBar(messages.message, ['bg-success', 'text-white']);
-      
+        // this.dialog.open(AddUnityComponent, {
+        //   data: messages.message,
+        //   disableClose: true,
+        // });
       } else {
         this.openSnackBar(messages.message, ['bg-danger', 'text-white']);
-       
+        // this.dialog.open(AddUnityComponent, {
+        //   data: messages.message,
+        //   disableClose: true,
+        // });
       }
     })
   }
@@ -162,8 +164,8 @@ export class ProduitComponent implements OnInit {
     })
   }
   // tslint:disable-next-line - Disables all
-  updateRowData(row_obj: productDocType) {
-    this.ProduitService.updateProduct(row_obj).then((messages) => {
+  updateRowData(row_obj: UnityDocType) {
+    this.UnityService.updateUnity(row_obj).then((messages) => {
       if (messages?.updated) {
         this.openSnackBar(messages.message, ['bg-success', 'text-dark']);
       } else if (!messages?.updated) {
@@ -173,8 +175,8 @@ export class ProduitComponent implements OnInit {
   }
 
   // // tslint:disable-next-line - Disables all
-  async deleteRowData(row_obj: productDocType) {
-    await this.ProduitService.deleteProduct(row_obj.id).then((deleted) => {
+  async deleteRowData(row_obj: UnityDocType) {
+    await this.UnityService.deleteUnity(row_obj.id).then((deleted) => {
       if (deleted) {
         this.openSnackBar("suppression effectuée!", ['bg-success', 'text-dark']);
       } else {
@@ -187,15 +189,15 @@ export class ProduitComponent implements OnInit {
 @Component({
   // tslint:disable-next-line: component-selector 
   selector: 'app-dialog-content',
-  templateUrl: 'product.dialog.html',
+  templateUrl: 'unity.dialog.html',
 })
 // tslint:disable-next-line: component-class-suffix
-export class ProductDialogContentComponent {
+export class UnityDialogContentComponent {
   local_data: any;
   action = '';
   constructor(
     public datePipe: DatePipe,
-    public dialogRef: MatDialogRef<ProductDialogContentComponent>,
+    public dialogRef: MatDialogRef<UnityDialogContentComponent>,
     // @Optional() is used to prevent error if no data is passed
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
   ) {

@@ -59,6 +59,8 @@ const MENUITEMS = [
     icon: 'store',
     children: [
       { state: 'produit', name: 'Produit', type: 'link' },
+      { state: 'unity', name: 'unités', type: 'link' },
+      { state: 'category', name: 'catégories', type: 'link' },
       
     ],
   },

@@ -18,7 +18,7 @@ export class FullComponent implements OnDestroy {
   dark = false;
   minisidebar = false;
   boxed = false;
-  horizontal = false;
+  horizontal = true;
 
   green = false;
   blue = false;

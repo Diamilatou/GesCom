@@ -17,6 +17,8 @@ Main sidebar
 
 #snav {
   box-shadow: 1px 0px 20px rgba(0, 0, 0, 0.08);
+ 
+
 
   .mat-drawer-inner-container {
     overflow: hidden;
@@ -24,6 +26,8 @@ Main sidebar
 
   .mat-nav-list .mat-list-item {
     height: auto;
+    margin-left: 20px;
+   
 
     &:hover {
       background: none;
@@ -31,8 +35,8 @@ Main sidebar
 
     .mat-list-item-content {
       display: block;
-      padding: 0px 0px;
-
+      // padding: 30px;
+      // border: 2px solid green;
       &:hover {
         background: none;
 
