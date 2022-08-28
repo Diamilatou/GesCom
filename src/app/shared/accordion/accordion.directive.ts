@@ -1,6 +1,5 @@
 import { Directive } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
-import 'rxjs/add/operator/filter';
 
 import { AccordionLinkDirective } from './accordionlink.directive';
 

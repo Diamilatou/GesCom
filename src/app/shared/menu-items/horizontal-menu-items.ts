@@ -77,7 +77,7 @@ const MENUITEMS = [
     state: 'stocks',
     name: 'Stocks',
     type: 'sub',
-    icon: 'assignement',
+    icon: 'account_balance',
     children: [
       { state: 'stock', name: 'Stock', type: 'link' },
      
