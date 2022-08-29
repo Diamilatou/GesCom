@@ -12,6 +12,11 @@ import {
 } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { RxUnityDocument } from 'src/app/RxDB';
+import { CategoryService } from '../category/category.service';
+import { ReplaySubject, Subject , takeUntil} from 'rxjs';
+import { FormControl } from '@angular/forms';
+import { SelectFilterService } from 'src/app/services/select-filter.service';
+import { UnityService } from '../unity/unity.service';
 @Component({
   selector: 'app-produit',
   templateUrl: './produit.component.html',
@@ -100,7 +105,7 @@ export class ProduitComponent implements OnInit {
           modified_at:value.modified_at,
         }
       })
-      this.dataSource.data = this.Product;
+      this.dataSource.data = this.Product; 
       // this.dataSource.paginator = this.paginator;
       this.dataSource.sort = this.sort;
       
@@ -192,23 +197,72 @@ export class ProduitComponent implements OnInit {
 // tslint:disable-next-line: component-class-suffix
 export class ProductDialogContentComponent {
   local_data: any;
+  category:any;
+  unity:any;
+  public filterCaegories = new ReplaySubject(0);
+  public filterUnity = new ReplaySubject(1);
+  public searchFilterCtrl: FormControl = new FormControl();
+  public searchFilterUnityCtrl: FormControl = new FormControl();
+  protected _onDestroy = new Subject();
   action = '';
   constructor(
     public datePipe: DatePipe,
     public dialogRef: MatDialogRef<ProductDialogContentComponent>,
+    public catService: CategoryService, 
+    public unityService: UnityService,
+    public selectFilter: SelectFilterService,
     // @Optional() is used to prevent error if no data is passed
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any,
   ) {
-    this.local_data = {
-      doc: {
-        id: data.doc.id,
-        name: data.doc.name,
-      },
-      action: data.action
-    };
+    this.local_data = { ...data };
+    this.local_data.unity = this.local_data.unity?.id;
+    this.local_data.category = this.local_data.category?.id;
     this.action = this.data.action;
+    this.getcategories();
+    this.getUnity();
   }
 
+  getcategories(){
+    this.catService.getCategory().pipe(
+      tap(() => {
+        NgZone.assertInAngularZone();
+      })
+      ).subscribe((data)=>{
+        this.filterCaegories.next(data);
+        this.category = data
+        this.searchFilterCtrl.valueChanges
+        .pipe(takeUntil(this._onDestroy))
+        .subscribe(() => {
+          this.filterCaegories.next(
+            this.selectFilter.filterMethodWithName(
+              data,
+              this.searchFilterCtrl.value,
+            ),
+          );
+        });
+      } )    
+  }
+  getUnity() {
+    this.unityService.getUnity().pipe(
+      tap(() => {
+        NgZone.assertInAngularZone();
+      })
+    ).subscribe((unitys) => {
+      this.filterUnity.next(unitys);
+      this.unity = unitys
+      this.searchFilterUnityCtrl.valueChanges
+        .pipe(takeUntil(this._onDestroy))
+        .subscribe(() => {
+          this.filterUnity.next(
+            this.selectFilter.filterMethodWithName(
+              unitys,
+              this.searchFilterUnityCtrl.value,
+            ),
+          );
+        });
+    })
+  }
+  
   doAction(): void {
     this.dialogRef.close({ event: this.action, data: this.local_data });
   }

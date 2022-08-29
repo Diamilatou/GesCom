@@ -17,7 +17,7 @@
                   </button>
                 </span>
                 <button mat-raised-button color="primary" (click)="openDialog('Add', {})">
-                  Ajouter une Unité
+                  Ajouter un Produit
                 </button>
               </div>
   
@@ -34,6 +34,31 @@
               <ng-container matColumnDef="name">
                 <mat-header-cell *matHeaderCellDef mat-sort-header> Nom </mat-header-cell>
                 <mat-cell *matCellDef="let row"> {{ row.name }} </mat-cell>
+              </ng-container>
+              <!-- Name Column -->
+              <ng-container matColumnDef="category">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> Categories </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.category.name }} </mat-cell>
+              </ng-container>
+              <!-- Name Column -->
+              <ng-container matColumnDef="unity">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> Unité </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.unity.name }} </mat-cell>
+              </ng-container>
+              <!-- Name Column -->
+              <ng-container matColumnDef="seuil">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> Seuil </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.seuil }} </mat-cell>
+              </ng-container>
+              <!-- Name Column -->
+              <ng-container matColumnDef="selling_price">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> Prix de Vente </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.selling_price }} </mat-cell>
+              </ng-container>
+              <!-- Name Column -->
+              <ng-container matColumnDef="buying_price">
+                <mat-header-cell *matHeaderCellDef mat-sort-header> Prix d'achat </mat-header-cell>
+                <mat-cell *matCellDef="let row"> {{ row.buying_price }} </mat-cell>
               </ng-container>
               <!-- Action -->
               <ng-container matColumnDef="action">

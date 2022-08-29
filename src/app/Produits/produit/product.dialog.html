@@ -12,25 +12,39 @@
                     </mat-form-field>
                 </div>
             </div>
-        </div>
-        <div fxLayout="row wrap" class="align-items-center">
+       
             <div fxFlex="100" fxFlex.gt-md="100">
                 <div class="m-r-100 m-l-100">
                     <mat-form-field>
                         <mat-select placeholder="Categorie de Produit" [(ngModel)]="local_data.category" required
-                            id="category_id" name="categorie_id">
+                            id="category" name="category">
                             <mat-option>
                                 <ngx-mat-select-search [formControl]="searchFilterCtrl">
                                 </ngx-mat-select-search>
                             </mat-option>
-                            <mat-option *ngFor="let category of filterCaegories  | async" [value]="category.id">
-                                {{category?.name}}</mat-option>
+                            <mat-option *ngFor="let cat of filterCaegories  | async" [value]="cat.id">
+                                {{cat?.name}}</mat-option>
                         </mat-select>
                     </mat-form-field>
                 </div>
             </div>
-        </div>
-        <div fxLayout="row wrap" class="align-items-center">
+       
+            <div fxFlex="100" fxFlex.gt-md="100">
+                <div class="m-r-100 m-l-100">
+                    <mat-form-field>
+                        <mat-select placeholder="Unité de Produit" [(ngModel)]="local_data.unity" required
+                            id="unity" name="unity">
+                            <mat-option>
+                                <ngx-mat-select-search [formControl]="searchFilterUnityCtrl">
+                                </ngx-mat-select-search>
+                            </mat-option>
+                            <mat-option *ngFor="let unity of filterUnity  | async" [value]="unity.id">
+                                {{unity?.name}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+        
             <div fxFlex="100" fxFlex.gt-md="100">
                 <div class="m-r-100 m-l-100">
                     <mat-form-field>
@@ -39,8 +53,7 @@
                     </mat-form-field>
                 </div>
             </div>
-        </div>
-        <div fxLayout="row wrap" class="align-items-center">
+        
             <div fxFlex="100" fxFlex.gt-md="100">
                 <div class="m-r-100 m-l-100">
                     <mat-form-field>
@@ -49,8 +62,7 @@
                     </mat-form-field>
                 </div>
             </div>
-        </div>
-        <div fxLayout="row wrap" class="align-items-center">
+       
             <div fxFlex="100" fxFlex.gt-md="100">
                 <div class="m-r-100 m-l-100">
                     <mat-form-field>
