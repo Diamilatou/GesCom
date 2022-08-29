@@ -8,7 +8,8 @@ import { CategoryComponent, CategoryDialogContentComponent } from './category/ca
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DemoMaterialModule } from '../demo-material-module';
-
+import { MatSelectModule } from '@angular/material/select';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search'
 
 @NgModule({
   declarations: [
@@ -26,6 +27,8 @@ import { DemoMaterialModule } from '../demo-material-module';
     FormsModule,
     ReactiveFormsModule,
     FlexLayoutModule,
+    MatSelectModule,
+    NgxMatSelectSearchModule
   ]
 })
 export class ProduitsModule { }
